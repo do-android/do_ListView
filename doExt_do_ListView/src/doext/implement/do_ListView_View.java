@@ -107,7 +107,6 @@ public class do_ListView_View extends DoPullToRefreshView implements DoIUIModule
 		yZoom = _doUIModule.getYZoom();
 		TYPEID = this.model.getTypeID();
 		listview.setOnItemClickListener(this);
-		listview.setOnItemLongClickListener(this);
 		listview.setOnScrollListener(this);
 
 		String _headerViewPath = this.model.getHeaderView();
@@ -199,12 +198,18 @@ public class do_ListView_View extends DoPullToRefreshView implements DoIUIModule
 	private DoUIContainer footerRootUIContainer;
 	private String footerUIPath;
 
-	public void loadDefalutScriptFile() throws Exception {
+	protected void loadDefalutScriptFile() throws Exception {
 		if (headerRootUIContainer != null && headerUIPath != null) {
 			headerRootUIContainer.loadDefalutScriptFile(headerUIPath);
 		}
 		if (footerRootUIContainer != null && footerUIPath != null) {
 			footerRootUIContainer.loadDefalutScriptFile(footerUIPath);
+		}
+
+		DoEventCenter _eventCenter = this.model.getEventCenter();
+		if ( _eventCenter.containsEvent("longTouch") || _eventCenter.containsEvent("longTouch1")) {
+			//加上这个后selectColor就在触发longTouch事件恢复原来的颜色
+			listview.setOnItemLongClickListener(this);
 		}
 	}
 
@@ -259,9 +264,10 @@ public class do_ListView_View extends DoPullToRefreshView implements DoIUIModule
 			try {
 				String _bgColor = this.model.getPropertyValue("bgColor");
 				String _selectedColor = _changedValues.get("selectedColor");
-				Drawable normal = new ColorDrawable(DoUIModuleHelper.getColorFromString(_bgColor, Color.WHITE));
-				Drawable selected = new ColorDrawable(DoUIModuleHelper.getColorFromString(_selectedColor, Color.WHITE));
-				Drawable pressed = new ColorDrawable(DoUIModuleHelper.getColorFromString(_selectedColor, Color.WHITE));
+				int _bgColorVal = DoUIModuleHelper.getColorFromString(_bgColor, Color.TRANSPARENT);
+				Drawable normal = new ColorDrawable(_bgColorVal);
+				Drawable selected = new ColorDrawable(DoUIModuleHelper.getColorFromString(_selectedColor, _bgColorVal));
+				Drawable pressed = new ColorDrawable(DoUIModuleHelper.getColorFromString(_selectedColor, _bgColorVal));
 				listview.setSelector(getBg(normal, selected, pressed));
 			} catch (Exception _err) {
 				DoServiceContainer.getLogEngine().writeError("do_ListView selectedColor \n\t", _err);
