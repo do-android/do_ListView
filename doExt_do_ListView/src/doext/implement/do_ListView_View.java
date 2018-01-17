@@ -377,6 +377,11 @@ public class do_ListView_View extends DoPullToRefreshView implements DoIUIModule
 	@Override
 	public void onRedraw() {
 		this.setLayoutParams(DoUIModuleHelper.getLayoutParams(this.model));
+		//动态的改变listview的大小后 里面的子元素  MyListView大小并没有发生变化 所以要重新设置一下
+		ViewGroup.LayoutParams params = listview.getLayoutParams();
+		params.width = (int) (this.model.getRealWidth());
+		params.height = (int) (this.model.getRealHeight());
+		listview.setLayoutParams(params);
 	}
 
 	private void initViewTemplate(String data) {
